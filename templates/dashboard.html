@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ session.username }}</h2>
+
+<div class="stats">
+    <div class="card">
+        <h2>{{ total_books }}</h2>
+        <p>Book titles in the library</p>
+    </div>
+    <div class="card">
+        <h2>{{ active_loans }}</h2>
+        <p>Books currently borrowed</p>
+    </div>
+</div>
+{% endblock %}

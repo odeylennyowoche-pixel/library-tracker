@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Members{% endblock %}
+
+{% block content %}
+<h2>Members</h2>
+
+<div class="card" style="max-width: 520px;">
+    <h3>Register a new member</h3>
+    <form method="POST">
+        <label>Username</label>
+        <input type="text" name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Create member</button>
+    </form>
+</div>
+
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Books out now</th>
+        <th>Total borrowed</th>
+    </tr>
+    {% for m in members %}
+    <tr>
+        <td>{{ m.username }}</td>
+        <td>{{ m.loans | selectattr('returned_on', 'none') | list | length }}</td>
+        <td>{{ m.loans | length }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3">No members yet.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

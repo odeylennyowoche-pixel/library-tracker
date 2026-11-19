@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Issue a book{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 520px;">
+    <h2>Issue a book</h2>
+    <form method="POST">
+        <label>Member</label>
+        <select name="member_id" required>
+            <option value="">Choose a member</option>
+            {% for m in members %}
+                <option value="{{ m.id }}">{{ m.username }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Book</label>
+        <select name="book_id" required>
+            <option value="">Choose a book</option>
+            {% for b in books %}
+                <option value="{{ b.id }}">{{ b.title }} by {{ b.author }} ({{ b.copies_available }} available)</option>
+            {% endfor %}
+        </select>
+
+               <label>Due date</label>
+        <input type="date" name="due_on" value="{{ default_due }}" required>
+        <p>The standard loan is 14 days, but you can pick any date. A late fine is charged for each day after it.</p>
+        <button type="submit">Issue book</button>
+        <a class="btn btn-gold" href="{{ url_for('loans') }}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

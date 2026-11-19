@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}My loans{% endblock %}
+
+{% block content %}
+<h2>My loans</h2>
+
+<table>
+    <tr>
+        <th>Book</th>
+        <th>Borrowed</th>
+        <th>Due</th>
+        <th>Status</th>
+        <th>Fine (₦)</th>
+    </tr>
+    {% for loan in loans %}
+    <tr>
+        <td>{{ loan.book.title }}</td>
+        <td>{{ loan.borrowed_on.strftime('%d %b %Y') }}</td>
+        <td>{{ loan.due_on.strftime('%d %b %Y') }}</td>
+        <td>
+            {% if loan.returned_on %}
+                <span class="badge ok">Returned</span>
+            {% elif loan.due_on < today %}
+                <span class="badge out">Overdue</span>
+            {% else %}
+                <span class="badge gold">On loan</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if loan.returned_on %}{{ loan.fine }}{% else %}{{ loan.calculate_fine() }}{% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">You have no loans.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

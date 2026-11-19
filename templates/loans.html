@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}All loans{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <h2>All loans</h2>
+    <a class="btn btn-gold" href="{{ url_for('issue_book') }}">Issue a book</a>
+</div>
+
+<table>
+    <tr>
+        <th>Book</th>
+        <th>Member</th>
+        <th>Borrowed</th>
+        <th>Due</th>
+        <th>Status</th>
+        <th>Fine (₦)</th>
+        <th></th>
+    </tr>
+    {% for loan in loans %}
+    <tr>
+        <td>{{ loan.book.title }}</td>
+        <td>{{ loan.member.username }}</td>
+        <td>{{ loan.borrowed_on.strftime('%d %b %Y') }}</td>
+        <td>{{ loan.due_on.strftime('%d %b %Y') }}</td>
+        <td>
+            {% if loan.returned_on %}
+                <span class="badge ok">Returned</span>
+            {% elif loan.due_on < today %}
+                <span class="badge out">Overdue</span>
+            {% else %}
+                <span class="badge gold">On loan</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if loan.returned_on %}{{ loan.fine }}{% else %}{{ loan.calculate_fine() }}{% endif %}
+        </td>
+        <td>
+            {% if not loan.returned_on %}
+            <form class="inline" method="POST" action="{{ url_for('return_book', loan_id=loan.id) }}">
+                <button class="btn-small" type="submit">Mark returned</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No loans yet.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}
