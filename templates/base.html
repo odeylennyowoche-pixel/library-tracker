@@ -24,8 +24,9 @@
             <a href="{{ url_for('my_loans') }}">My loans</a>
         {% endif %}
     </nav>
-    <div class="user-box">
+        <div class="user-box">
         {{ session.username }} ({{ session.role }})<br>
+        <a href="{{ url_for('change_password') }}">Change password</a><br>
         <a href="{{ url_for('logout') }}">Log out</a>
     </div>
 </aside>

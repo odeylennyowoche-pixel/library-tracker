@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 from functools import wraps
 
@@ -6,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "change-this-secret-key"
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-secret-change-me")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///library.db"
 
 db = SQLAlchemy(app)
@@ -141,12 +142,20 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    total_books = Book.query.count()
-    active_loans = Loan.query.filter_by(returned_on=None).count()
-    return render_template("dashboard.html",
-                           total_books=total_books,
-                           active_loans=active_loans)
+    today = date.today()
+    active_query = Loan.query.filter_by(returned_on=None)
+    if session["role"] != "admin":
+        active_query = active_query.filter_by(user_id=session["user_id"])
 
+    active = active_query.all()
+    overdue = [l for l in active if l.due_on < today]
+    fines_owed = sum(l.calculate_fine() for l in overdue)
+
+    return render_template("dashboard.html",
+                           total_books=Book.query.count(),
+                           active_loans=len(active),
+                           overdue_count=len(overdue),
+                           fines_owed=fines_owed)
 
 @app.route("/admin")
 @login_required
@@ -369,6 +378,29 @@ def manage_members():
     return render_template("members.html", members=all_members)
 
 
+@app.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        current = request.form["current"]
+        new = request.form["new"]
+        confirm = request.form["confirm"]
+        user = db.session.get(User, session["user_id"])
+
+        if not user.check_password(current):
+            flash("Your current password is wrong.")
+        elif len(new) < 6:
+            flash("The new password must be at least 6 characters.")
+        elif new != confirm:
+            flash("The new passwords do not match.")
+        else:
+            user.set_password(new)
+            db.session.commit()
+            flash("Password changed.", "success")
+            return redirect(url_for("dashboard"))
+
+    return render_template("change_password.html")
+    
 # ------------------------------------------------------------------ run
 
 if __name__ == "__main__":

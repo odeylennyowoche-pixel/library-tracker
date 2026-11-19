@@ -167,3 +167,6 @@ select {
     font-size: 15px;
 }
 .badge.gold { background: var(--gold); }
+.stats { flex-wrap: wrap; }
+.stats .card { min-width: 180px; }
+.stats .card.alert h2 { color: var(--red); }

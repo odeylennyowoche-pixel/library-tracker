@@ -11,7 +11,15 @@
     </div>
     <div class="card">
         <h2>{{ active_loans }}</h2>
-        <p>Books currently borrowed</p>
+        <p>{% if session.role == 'admin' %}Books currently borrowed{% else %}Books you have out{% endif %}</p>
+    </div>
+    <div class="card {% if overdue_count %}alert{% endif %}">
+        <h2>{{ overdue_count }}</h2>
+        <p>Overdue</p>
+    </div>
+    <div class="card {% if fines_owed %}alert{% endif %}">
+        <h2>₦{{ fines_owed }}</h2>
+        <p>Fines owed so far</p>
     </div>
 </div>
 {% endblock %}
